@@ -190,7 +190,7 @@ class TestProductRoutes(TestCase):
         # update product
         new_product = response.get_json()
         new_product["description"] = "unknown"
-        resp = self.client.put(f"{BASE_URL}/{new_product["id"]}", json=new_product)
+        resp = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # retrieve data
@@ -200,18 +200,18 @@ class TestProductRoutes(TestCase):
     def test_delete_product(self):
         """It should Delete a Product"""
         products = self._create_products(5)
-        count = self.get_product_count(products)
+        count = self.get_product_count()
 
         # delete test prod and confirm empty response
         test_product = products[0]
-        response = self.client.delete(f"{BASE_URL}/{test_product["id"]}")
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
         # confirm deletion
-        resp = self.client.get(f"{BASE_URL}/{test_product["id"]}")
+        resp = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        new_count = self.get_product_count(products)
+        new_count = self.get_product_count()
         self.assertEqual(new_count, count - 1)
 
     def test_get_product_list(self):
@@ -228,7 +228,7 @@ class TestProductRoutes(TestCase):
         """It should Query Products by name"""
         products = self._create_products(5)
         test_name = products[0].name
-        
+
         # name count, request
         name_count = len([prd for prd in products if prd.name == test_name])
         response = self.client.get(BASE_URL, query_string=f"name={quote_plus(test_name)}")
@@ -246,10 +246,10 @@ class TestProductRoutes(TestCase):
         """It should Query Products by category"""
         products = self._create_products(10)
         category = products[0].category
-        
+
         # test category
         found = [prd for prd in products if prd.category == category]
-        found_count = len(found) 
+        found_count = len(found)
         logging.debug("Found Products [%d] %s", found_count, found)
 
         response = self.client.get(BASE_URL, query_string=f"category={category.name}")
@@ -269,7 +269,7 @@ class TestProductRoutes(TestCase):
 
         # test available
         available_products = [prd for prd in products if prd.available is True]
-        available_count = len(available_products) 
+        available_count = len(available_products)
         logging.debug("Found Products [%d] %s", available_count, available_products)
 
         response = self.client.get(BASE_URL, query_string="available=true")
